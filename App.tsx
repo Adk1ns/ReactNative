@@ -1,13 +1,6 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useState } from 'react'
 import {
+  FlatList,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -15,106 +8,61 @@ import {
   Text,
   useColorScheme,
   View,
-} from 'react-native';
-
+  Alert,
+} from 'react-native'
 import {
   Colors,
   DebugInstructions,
-  Header,
   LearnMoreLinks,
   ReloadInstructions,
-
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+} from 'react-native/Libraries/NewAppScreen'
+import Header from './components/Header'
+import ListItem from './components/ListItem'
+import AddItem from './components/AddItem'
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [items, setItems] = useState([
+    { id: 1, text: 'Milk' },
+    { id: 2, text: 'Eggs' },
+    { id: 3, text: 'Bread' },
+    { id: 4, text: 'Juice' },
+  ])
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const deleteItem = (id: number) => {
+    setItems((prevItems) => {
+      return prevItems.filter((item) => item.id !== id)
+    })
+  }
+
+  const addItem = (text: string) => {
+    if (!text) {
+      Alert.alert('Error', 'Please enter an item', [{ text: 'Ok' }])
+    } else {
+      setItems((prevItems) => {
+        return [{ id: Math.floor(Math.random() * 1000000), text }, ...prevItems]
+      })
+    }
+  }
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View style={styles.container}>
+      <Header title="Shopping List" />
+      <AddItem addItem={addItem} />
+      <FlatList
+        data={items}
+        renderItem={({ item }) => (
+          <ListItem item={item} deleteItem={deleteItem} />
+        )}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits. Howdy!
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-          <Text>Hola!</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    paddingTop: 60,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+})
 
-export default App;
+export default App
